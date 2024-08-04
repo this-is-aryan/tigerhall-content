@@ -1,8 +1,10 @@
 import React from 'react'
 import { styles } from './home-screen.styles'
-import { Text, View, SafeAreaView, Image } from 'react-native'
+import { View, SafeAreaView, Image } from 'react-native'
 import { images } from '../../utils'
 import { SearchInput } from '../../components'
+import { useQuery } from '@apollo/client'
+import { GET_CONTENTS } from '../../services/graphql/queries'
 
 const HomeScreenHeader = () => (
   <View style={styles.HeaderContainer}>
@@ -12,11 +14,21 @@ const HomeScreenHeader = () => (
 )
 
 export const HomeScreen = () => {
+  const { loading, error, data } = useQuery(GET_CONTENTS, {
+    variables: {
+      filter: {
+        keywords: '',
+        limit: 10,
+        types: ['PODCAST']
+      }
+    }
+  })
+  if (error) console.log('Error')
+  if (loading) console.log('Loading')
+  if (data) console.log(data)
   return (
-    <>
-      <SafeAreaView style={styles.StatusBar}>
-        <HomeScreenHeader />
-      </SafeAreaView>
-    </>
+    <SafeAreaView style={styles.StatusBar}>
+      <HomeScreenHeader />
+    </SafeAreaView>
   )
 }
