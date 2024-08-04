@@ -41,8 +41,8 @@ export const ContentCard = (props: Podcast) => {
         <Text style={styles.Participant}>{`${participants[0]?.firstName?.trim()} ${participants[0]?.lastName?.trim()}`}</Text>
         {!!participants[0]?.company && <Text style={styles.Company}>{`${participants[0]?.company?.trim()}`}</Text>}
         <View style={styles.ShareAndSaveContainer}>
-          <Ionicons style={styles.ShareIcon} name="share-social-outline" size={22} color={palette.orange69} />
-          <Ionicons name="bookmark-outline" size={22} color={palette.orange69} />
+          <Ionicons style={styles.ShareIcon} name="share-social-outline" size={22} color={palette.orange29} />
+          <Ionicons name="bookmark-outline" size={22} color={palette.orange29} />
         </View>
       </View>
       <View></View>

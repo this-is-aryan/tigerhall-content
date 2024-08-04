@@ -23,16 +23,17 @@ export const styles = StyleSheet.create({
     width: 40
   } as ImageStyle,
 
-  ListHeader: {
-    fontSize: 22,
-    marginVertical: 20,
-    color: palette.white,
-    alignSelf: 'center',
-    fontWeight: '900'
-  } as TextStyle,
+  ErrorContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 16,
+    flex: 1
+  } as ViewStyle,
 
-  ContentList: {
-    paddingBottom: 100,
-    marginHorizontal: 16
-  } as ViewStyle
+  ErrorText: {
+    fontSize: 18,
+    color: palette.white,
+    textAlign: 'center',
+    marginTop: 16
+  } as TextStyle
 })
