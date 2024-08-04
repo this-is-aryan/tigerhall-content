@@ -11,8 +11,10 @@
     "format:ts": "prettier --write '**/*.ts{,x}'"
   },
   "dependencies": {
+    "@apollo/client": "^3.11.2",
     "expo": "51.0.24",
     "expo-status-bar": "1.12.1",
+    "graphql": "^15.8.0",
     "react": "18.2.0",
     "react-native": "0.74.3"
   },
