@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback, memo, useEffect } from 'react'
 import { styles } from './home-screen.styles'
 import { View, SafeAreaView, Image, Text } from 'react-native'
-import { images } from '../../utils'
+import { debounce, images } from '../../utils'
 import { ContentList, ContentLoader, SearchInput } from '../../components'
 import { useQuery } from '@apollo/client'
 import { GET_CONTENTS } from '../../services/graphql/queries'
@@ -17,35 +17,80 @@ const ErrorView = () => (
   </View>
 )
 
-export const HomeScreen = () => {
+const HomeScreenComponent = () => {
   const [searchValue, setSearchValue] = useState<string>('')
   const [isListRefreshing, setIsListRefreshing] = useState<boolean>(false)
-  const [loadingMore, setLoadingMore] = useState<boolean>(false)
-
-  const { loading, error, data, refetch } = useQuery<ContentCardsData, ContentCardsVars>(GET_CONTENTS, {
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
+  const [offset, setOffset] = useState<number>(0)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>('')
+  const { loading, error, data, refetch, fetchMore } = useQuery<ContentCardsData, ContentCardsVars>(GET_CONTENTS, {
     variables: {
       filter: {
-        keywords: searchValue,
-        limit: 10,
+        keywords: debouncedSearchValue,
+        limit: 5,
         offset: 0,
         types: [TIGERHALL_CONTENT_TYPES.PODCAST]
       }
     }
   })
+  // Debounced version of search query
+  const debounceSearch = debounce((value: string) => {
+    setDebouncedSearchValue(value)
+  }, 300)
 
-  const handleRefresh = async () => {
+  // Update debounced value when searchValue changes
+  useEffect(() => {
+    debounceSearch(searchValue)
+  }, [searchValue, debounceSearch])
+
+  const handleRefresh = useCallback(async () => {
     setIsListRefreshing(true)
     try {
       await refetch()
     } finally {
       setIsListRefreshing(false)
     }
-  }
+  }, [refetch])
 
-  const handleLoadMore = () => {}
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMore) return
+    try {
+      setIsLoadingMore(true)
+      await fetchMore({
+        variables: {
+          filter: {
+            keywords: searchValue,
+            limit: 5,
+            offset: offset + 5,
+            types: [TIGERHALL_CONTENT_TYPES.PODCAST]
+          }
+        },
+        updateQuery: (prevResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult?.contentCards.edges.length) {
+            setHasMore(false)
+            return prevResult
+          }
+          return {
+            ...prevResult,
+            contentCards: {
+              edges: [...prevResult.contentCards.edges, ...fetchMoreResult.contentCards.edges]
+            }
+          }
+        }
+      })
+      setOffset(offset + 5)
+    } catch (error) {
+      console.error('Error loading more data:', error)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [hasMore, isLoadingMore, fetchMore, searchValue, offset])
 
-  const ScreenContent = () => {
-    if (error) return <ErrorView />
+  const ScreenContent = useMemo(() => {
+    if (error) {
+      return <ErrorView />
+    }
     if (loading || isListRefreshing) return <ContentLoader />
     if (data)
       return (
@@ -54,10 +99,10 @@ export const HomeScreen = () => {
           onRefresh={handleRefresh}
           listData={data}
           onEndReached={handleLoadMore}
-          isLoadingMore={loadingMore}
+          isLoadingMore={isLoadingMore}
         />
       )
-  }
+  }, [error, loading, isListRefreshing, data, handleRefresh, handleLoadMore, isLoadingMore])
 
   return (
     <>
@@ -66,8 +111,10 @@ export const HomeScreen = () => {
           <Image style={styles.Logo} source={images.image_tigerhall_logo} resizeMode={'contain'} />
           <SearchInput searchInput={searchValue} onChangeSearchInput={setSearchValue} />
         </View>
-        <ScreenContent />
+        {ScreenContent}
       </SafeAreaView>
     </>
   )
 }
+
+export const HomeScreen = memo(HomeScreenComponent)

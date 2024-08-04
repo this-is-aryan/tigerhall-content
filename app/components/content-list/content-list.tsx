@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useMemo, memo } from 'react'
 import { styles } from './content-list.styles'
 import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native'
 import { ContentCardsData, Podcast } from '../content-card/content-card.types'
@@ -10,17 +10,16 @@ interface ContentListProps {
   listData: ContentCardsData
   isRefreshing: boolean
   onRefresh: () => void
-  onEndReached?: () => void
+  onEndReached: () => void
   isLoadingMore?: boolean
 }
 
-export const ContentList = (props: ContentListProps) => {
-  const { listData, isRefreshing, onRefresh, isLoadingMore, onEndReached } = props
+const TigerhallContentList = (props: ContentListProps) => {
+  const { listData, isRefreshing, onRefresh, onEndReached, isLoadingMore } = props
   const { edges } = listData?.contentCards || []
+  const renderItem = ({ item }: { item: Podcast }) => <ContentCard key={item.id} {...item} />
 
-  const renderItem = ({ item, index }: { item: Podcast; index: number }) => <ContentCard key={index} {...item} />
-
-  const keyExtractor = (_: any, index: number) => `content-item-${index}`
+  const keyExtractor = (item: Podcast) => `content-item-${item.id}`
 
   const ListHeaderComponent = useRef(() => <Text style={styles.ListHeader}>{`Tigerhall Library`}</Text>).current
 
@@ -31,15 +30,15 @@ export const ContentList = (props: ContentListProps) => {
     </View>
   )).current
 
-  const ListFooterComponent = () => {
-    if (!isLoadingMore) return null
+  const ListFooterComponent = useMemo(() => {
+    if (!isLoadingMore) return
     return (
       <View style={styles.ListFooter}>
         <ActivityIndicator size="large" color={palette.white} />
         <Text style={styles.FooterText}>Loading more items...</Text>
       </View>
     )
-  }
+  }, [isLoadingMore])
 
   return (
     <FlatList
@@ -48,13 +47,15 @@ export const ContentList = (props: ContentListProps) => {
       renderItem={renderItem}
       contentContainerStyle={styles.ContentList}
       showsVerticalScrollIndicator={false}
-      maxToRenderPerBatch={5}
       ListHeaderComponent={ListHeaderComponent}
       ListEmptyComponent={ListEmptyComponent}
       ListFooterComponent={ListFooterComponent}
       onEndReached={onEndReached}
+      maxToRenderPerBatch={5}
       onEndReachedThreshold={0.1}
       refreshControl={<RefreshControl colors={[palette.white]} tintColor={palette.white} refreshing={isRefreshing} onRefresh={onRefresh} />}
     />
   )
 }
+
+export const ContentList = memo(TigerhallContentList)

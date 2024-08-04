@@ -3,5 +3,15 @@ import { GRAPHQL_URL } from '../../constants'
 
 export const apolloClient = new ApolloClient({
   uri: GRAPHQL_URL,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          contentCards: {
+            merge: true
+          }
+        }
+      }
+    }
+  })
 })

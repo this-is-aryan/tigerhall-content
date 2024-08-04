@@ -13,6 +13,7 @@ export interface Participant {
 }
 
 export interface Podcast {
+  id: string
   name: string
   image: Image
   categories: Category[]

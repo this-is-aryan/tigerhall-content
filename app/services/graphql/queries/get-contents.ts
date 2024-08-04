@@ -5,6 +5,7 @@ export const GET_CONTENTS = gql`
     contentCards(filter: $filter) {
       edges {
         ... on Podcast {
+          id
           name
           length
           timeSpentOnByUsers
