@@ -12,7 +12,8 @@ export const styles = StyleSheet.create({
 
   ContentImage: {
     height: 150,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    justifyContent: 'space-between'
   } as ImageStyle,
 
   ProgressContainer: {
@@ -28,6 +29,39 @@ export const styles = StyleSheet.create({
   Progress: {
     fontWeight: '700',
     marginLeft: 5
+  } as TextStyle,
+
+  ContentSpecsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    alignItems: 'flex-end'
+  } as ViewStyle,
+
+  Audio: {
+    height: 35,
+    width: 35,
+    borderRadius: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.orange29
+  } as ViewStyle,
+
+  ContentLengthContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
+    backgroundColor: palette.black07,
+    borderRadius: 20,
+    height: 30
+  } as ViewStyle,
+
+  ContentLength: {
+    color: palette.white,
+    marginLeft: 3,
+    fontWeight: '700'
   } as TextStyle,
 
   ContentContainer: {
@@ -61,5 +95,14 @@ export const styles = StyleSheet.create({
     textTransform: 'capitalize',
     fontWeight: '700',
     color: palette.grey4D
+  } as TextStyle,
+
+  ShareAndSaveContainer: {
+    flexDirection: 'row',
+    alignSelf: 'flex-end'
+  } as ViewStyle,
+
+  ShareIcon: {
+    marginRight: 10
   } as TextStyle
 })
