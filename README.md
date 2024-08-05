@@ -36,6 +36,7 @@ TigerHall Content is a react native application that can be used to search Tiger
 - Different Utils like Device, Image and Code Helper are available to extend the project functionality.
 - Different Design Utils like Color Palettes are separate modules for easy integration and ease of usage.
 - For API related functionalities, separate module for Queries is available and ready to extend.
+- For Testing, the project has Jest Library setup and has test cases written for all Major Components.
 - Project follows Domain-driven Folder structure for good developer experience and intuitive design.
 
 
@@ -52,6 +53,7 @@ This project currently includes:
 - TypeScript
 - Eslint
 - Prettier
+- Jest
 - And much more.
 
 Step 1: Cloning the repository
@@ -68,7 +70,10 @@ Once Cloning, open the project directory and run these commands:
 
 ```bash
 // Install Dependencies
-    npm Install
+    npm install
+
+// In case of any dependency error, run this command:
+    npm install --legacy-peer-deps
 
 // Open the terminal in same directory and run
     npm start
@@ -145,6 +150,17 @@ app
 
     This is the entry point to your app. This is where you will find the main App component which renders the rest of the application.
 
+
+
+## Running Tests
+
+The Project has tests written for Major Components and helper files.
+
+To run tests, run the following command
+
+```bash
+  npm run test
+```
 
 
 ## Authors
