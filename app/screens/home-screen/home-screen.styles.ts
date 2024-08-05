@@ -35,5 +35,20 @@ export const styles = StyleSheet.create({
     color: palette.white,
     textAlign: 'center',
     marginTop: 16
+  } as TextStyle,
+
+  RetryButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginVertical: 10,
+    backgroundColor: palette.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '70%',
+    borderRadius: 10
+  } as ViewStyle,
+  RetryText: {
+    fontSize: 16,
+    fontWeight: '600'
   } as TextStyle
 })

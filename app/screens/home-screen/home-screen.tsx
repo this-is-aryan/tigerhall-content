@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback, memo, useEffect } from 'react'
+import React, { useMemo, useCallback, memo, useEffect, useReducer } from 'react'
 import { styles } from './home-screen.styles'
-import { View, SafeAreaView, Image, Text } from 'react-native'
+import { View, SafeAreaView, Image, Text, TouchableOpacity } from 'react-native'
 import { debounce, images } from '../../utils'
 import { ContentList, ContentLoader, SearchInput } from '../../components'
 import { useQuery } from '@apollo/client'
@@ -9,21 +9,26 @@ import { ContentCardsData, ContentCardsVars } from '../../components/content-car
 import { TIGERHALL_CONTENT_TYPES } from '../../constants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { palette } from '../../theme'
+import { contentReducer, initialState } from '../../store'
 
-const ErrorView = () => (
+// ErrorView Component
+const ErrorView = ({ retry }: { retry: () => void }) => (
   <View style={styles.ErrorContainer}>
     <Ionicons color={palette.red05} size={100} name={'alert-circle-outline'} />
     <Text style={styles.ErrorText}>{`Oops! An error has occurred. Please try again later.`}</Text>
+    <TouchableOpacity style={styles.RetryButton} onPress={retry}>
+      <Text style={styles.RetryText}>Retry</Text>
+    </TouchableOpacity>
   </View>
 )
 
+// Initial state and reducer for managing complex state logic
+
 const HomeScreenComponent = () => {
-  const [searchValue, setSearchValue] = useState<string>('')
-  const [isListRefreshing, setIsListRefreshing] = useState<boolean>(false)
-  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
-  const [offset, setOffset] = useState<number>(0)
-  const [hasMore, setHasMore] = useState<boolean>(true)
-  const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>('')
+  const [state, dispatch] = useReducer(contentReducer, initialState)
+
+  const { searchValue, isListRefreshing, isLoadingMore, offset, hasMore, debouncedSearchValue } = state
+
   const { loading, error, data, refetch, fetchMore } = useQuery<ContentCardsData, ContentCardsVars>(GET_CONTENTS, {
     variables: {
       filter: {
@@ -34,9 +39,10 @@ const HomeScreenComponent = () => {
       }
     }
   })
+
   // Debounced version of search query
   const debounceSearch = debounce((value: string) => {
-    setDebouncedSearchValue(value)
+    dispatch({ type: 'SET_DEBOUNCED_SEARCH_VALUE', value })
   }, 300)
 
   // Update debounced value when searchValue changes
@@ -45,18 +51,18 @@ const HomeScreenComponent = () => {
   }, [searchValue, debounceSearch])
 
   const handleRefresh = useCallback(async () => {
-    setIsListRefreshing(true)
+    dispatch({ type: 'SET_LIST_REFRESHING', value: true })
     try {
       await refetch()
     } finally {
-      setIsListRefreshing(false)
+      dispatch({ type: 'SET_LIST_REFRESHING', value: false })
     }
   }, [refetch])
 
   const handleLoadMore = useCallback(async () => {
     if (isLoadingMore || !hasMore) return
+    dispatch({ type: 'SET_LOADING_MORE', value: true })
     try {
-      setIsLoadingMore(true)
       await fetchMore({
         variables: {
           filter: {
@@ -68,7 +74,7 @@ const HomeScreenComponent = () => {
         },
         updateQuery: (prevResult, { fetchMoreResult }) => {
           if (!fetchMoreResult?.contentCards.edges.length) {
-            setHasMore(false)
+            dispatch({ type: 'SET_HAS_MORE', value: false })
             return prevResult
           }
           return {
@@ -79,20 +85,24 @@ const HomeScreenComponent = () => {
           }
         }
       })
-      setOffset(offset + 5)
+      dispatch({ type: 'SET_OFFSET', value: offset + 5 })
     } catch (error) {
       console.error('Error loading more data:', error)
     } finally {
-      setIsLoadingMore(false)
+      dispatch({ type: 'SET_LOADING_MORE', value: false })
     }
   }, [hasMore, isLoadingMore, fetchMore, searchValue, offset])
 
+  const retryFetch = useCallback(async () => {
+    await refetch()
+  }, [refetch])
+
   const ScreenContent = useMemo(() => {
     if (error) {
-      return <ErrorView />
+      return <ErrorView retry={retryFetch} />
     }
     if (loading || isListRefreshing) return <ContentLoader />
-    if (data)
+    if (data) {
       return (
         <ContentList
           isRefreshing={isListRefreshing}
@@ -102,18 +112,18 @@ const HomeScreenComponent = () => {
           isLoadingMore={isLoadingMore}
         />
       )
-  }, [error, loading, isListRefreshing, data, handleRefresh, handleLoadMore, isLoadingMore])
+    }
+    return null
+  }, [error, loading, isListRefreshing, data, handleRefresh, handleLoadMore, isLoadingMore, retryFetch])
 
   return (
-    <>
-      <SafeAreaView style={styles.SceneContainer}>
-        <View style={styles.HeaderContainer}>
-          <Image style={styles.Logo} source={images.image_tigerhall_logo} resizeMode={'contain'} />
-          <SearchInput searchInput={searchValue} onChangeSearchInput={setSearchValue} />
-        </View>
-        {ScreenContent}
-      </SafeAreaView>
-    </>
+    <SafeAreaView style={styles.SceneContainer}>
+      <View style={styles.HeaderContainer}>
+        <Image style={styles.Logo} source={images.image_tigerhall_logo} resizeMode={'contain'} />
+        <SearchInput searchInput={searchValue} onChangeSearchInput={(value) => dispatch({ type: 'SET_SEARCH_VALUE', value })} />
+      </View>
+      {ScreenContent}
+    </SafeAreaView>
   )
 }
 

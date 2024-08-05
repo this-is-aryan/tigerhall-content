@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, memo } from 'react'
+import React, { useMemo, memo } from 'react'
 import { styles } from './content-list.styles'
 import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native'
 import { ContentCardsData, Podcast } from '../content-card/content-card.types'
@@ -17,21 +17,29 @@ interface ContentListProps {
 const TigerhallContentList = (props: ContentListProps) => {
   const { listData, isRefreshing, onRefresh, onEndReached, isLoadingMore } = props
   const { edges } = listData?.contentCards || []
-  const renderItem = ({ item }: { item: Podcast }) => <ContentCard key={item.id} {...item} />
+
+  const renderItem = useMemo(
+    () =>
+      ({ item }: { item: Podcast }) => <ContentCard key={item.id} {...item} />,
+    []
+  )
 
   const keyExtractor = (item: Podcast) => `content-item-${item.id}`
 
-  const ListHeaderComponent = useRef(() => <Text style={styles.ListHeader}>{`Tigerhall Library`}</Text>).current
+  const ListHeaderComponent = useMemo(() => <Text style={styles.ListHeader}>{`Tigerhall Library`}</Text>, [])
 
-  const ListEmptyComponent = useRef(() => (
-    <View style={styles.EmptyListContainer}>
-      <Ionicons name={'reader-outline'} color={palette.orange36} size={100} />
-      <Text style={styles.EmptyListText}>{`No Items Available.`}</Text>
-    </View>
-  )).current
+  const ListEmptyComponent = useMemo(
+    () => (
+      <View style={styles.EmptyListContainer}>
+        <Ionicons name={'reader-outline'} color={palette.orange36} size={100} />
+        <Text style={styles.EmptyListText}>{`No Items Available.`}</Text>
+      </View>
+    ),
+    []
+  )
 
   const ListFooterComponent = useMemo(() => {
-    if (!isLoadingMore) return
+    if (!isLoadingMore) return null
     return (
       <View style={styles.ListFooter}>
         <ActivityIndicator size="large" color={palette.white} />

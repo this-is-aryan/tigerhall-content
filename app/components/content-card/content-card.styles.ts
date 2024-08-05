@@ -1,6 +1,7 @@
 import { StyleSheet, ViewStyle, TextStyle, ImageStyle } from 'react-native'
 import { palette } from '../../theme'
 import { isAndroid } from '../../utils'
+import { CARD_IMAGE_HEIGHT } from '../../constants'
 
 export const styles = StyleSheet.create({
   ContentCardContainer: {
@@ -11,7 +12,7 @@ export const styles = StyleSheet.create({
   } as ViewStyle,
 
   ContentImage: {
-    height: 150,
+    height: CARD_IMAGE_HEIGHT,
     flexDirection: 'column',
     justifyContent: 'space-between'
   } as ImageStyle,
@@ -81,20 +82,23 @@ export const styles = StyleSheet.create({
   ContentName: {
     textTransform: 'capitalize',
     fontWeight: '800',
-    fontSize: 20
+    fontSize: 20,
+    marginTop: 5
   } as TextStyle,
 
   Participant: {
     textTransform: 'capitalize',
     fontSize: 16,
-    color: palette.grey4D
+    color: palette.grey4D,
+    marginTop: 5
   } as TextStyle,
 
   Company: {
     fontSize: 16,
     textTransform: 'capitalize',
     fontWeight: '700',
-    color: palette.grey4D
+    color: palette.grey4D,
+    marginVertical: 5
   } as TextStyle,
 
   ShareAndSaveContainer: {

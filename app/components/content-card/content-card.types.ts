@@ -18,6 +18,8 @@ export interface Podcast {
   image: Image
   categories: Category[]
   participants: Participant[]
+  timeSpentOnByUsers: number
+  length: number
 }
 
 export interface ContentCardsData {
