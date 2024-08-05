@@ -10,3 +10,5 @@ export enum TIGERHALL_CONTENT_TYPES {
 export const CARD_IMAGE_HEIGHT = 150
 
 export const CARD_IMAGE_WIDTH = deviceWidth - 32
+
+export const LIMIT = 5
