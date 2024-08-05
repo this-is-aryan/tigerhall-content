@@ -1,5 +1,4 @@
 import React, { useMemo, useCallback, memo, useEffect, useState } from 'react'
-import { styles } from './home-screen.styles'
 import { View, SafeAreaView, Image, Text, TouchableOpacity } from 'react-native'
 import { debounce, images } from '../../utils'
 import { ContentList, ContentLoader, SearchInput } from '../../components'
@@ -9,6 +8,7 @@ import { ContentCardsData, ContentCardsVars } from '../../components/content-car
 import { LIMIT, MAX_RETRIES, TIGERHALL_CONTENT_TYPES } from '../../constants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { palette } from '../../theme'
+import { styles } from './home-screen.styles'
 
 // ErrorView Component
 const ErrorView = ({ retry, canRetry }: { retry: () => void; canRetry: boolean }) => (
@@ -32,9 +32,9 @@ const HomeScreenComponent = () => {
   const [offset, setOffset] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [debouncedSearchValue, setDebouncedSearchValue] = useState('')
-
   const [retryCount, setRetryCount] = useState(0)
 
+  // Apollo Client query hook for fetching contents
   const { loading, error, data, refetch, fetchMore } = useQuery<ContentCardsData, ContentCardsVars>(GET_CONTENTS, {
     variables: {
       filter: {
@@ -56,6 +56,17 @@ const HomeScreenComponent = () => {
     debounceSearch(searchValue)
   }, [searchValue, debounceSearch])
 
+  // Trigger data refresh and pagination reset when debounced search value changes
+  useEffect(() => {
+    if (debouncedSearchValue !== '') {
+      refetch().then(() => {
+        setOffset(0)
+        setHasMore(true)
+      })
+    }
+  }, [debouncedSearchValue, refetch])
+
+  // Handle refreshing the list
   const handleRefresh = useCallback(async () => {
     setIsListRefreshing(true)
     try {
@@ -67,21 +78,23 @@ const HomeScreenComponent = () => {
     }
   }, [refetch])
 
+  // Load more data when reaching the end of the list
   const handleLoadMore = useCallback(async () => {
     if (!hasMore) return
+
     try {
       await fetchMore({
         variables: {
           filter: {
-            keywords: searchValue,
-            limit: 5,
+            keywords: debouncedSearchValue,
+            limit: LIMIT,
             offset: offset + LIMIT,
             types: [TIGERHALL_CONTENT_TYPES.PODCAST]
           }
         },
         updateQuery: (prevResult, { fetchMoreResult }) => {
           if (!fetchMoreResult?.contentCards.edges.length) {
-            setHasMore(false)
+            setHasMore(false) // No more data to load
             return prevResult
           }
           return {
@@ -92,17 +105,19 @@ const HomeScreenComponent = () => {
           }
         }
       })
-      setOffset(offset + LIMIT)
+      setOffset(offset + LIMIT) // Increment offset for pagination
     } catch (error) {
       console.error('Error loading more data:', error)
     }
-  }, [hasMore, fetchMore, searchValue, offset])
+  }, [hasMore, fetchMore, debouncedSearchValue, offset])
 
+  // Retry fetching data in case of error
   const retryFetch = useCallback(async () => {
     setRetryCount(retryCount + 1)
     await refetch()
   }, [refetch, retryCount])
 
+  // Memoized rendering of screen content based on query state
   const ScreenContent = useMemo(() => {
     if (error) {
       return <ErrorView retry={retryFetch} canRetry={retryCount < MAX_RETRIES} />
