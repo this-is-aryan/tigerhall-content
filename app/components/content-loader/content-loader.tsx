@@ -7,16 +7,16 @@ interface ContentLoaderProps {
 }
 
 const ContentCardPlaceholder = () => (
-  <View style={styles.LoaderContainer}>
-    <View style={styles.ImagePlaceholder} />
-    <View style={styles.ContentContainer}>
-      <View style={styles.CategoryPlaceholder} />
-      <View style={[styles.CategoryPlaceholder, styles.TitlePlaceholder]} />
-      <View style={[styles.CategoryPlaceholder, styles.ParticipantPlaceholder]} />
-      <View style={[styles.CategoryPlaceholder, styles.CompanyPlaceholder]} />
-      <View style={styles.IconsPlaceholderContainer}>
-        <View style={styles.Icon} />
-        <View style={styles.Icon} />
+  <View style={styles.LoaderContainer} testID="content-card-placeholder">
+    <View style={styles.ImagePlaceholder} testID="image-placeholder" />
+    <View style={styles.ContentContainer} testID="content-container">
+      <View style={styles.CategoryPlaceholder} testID="category-placeholder" />
+      <View style={[styles.CategoryPlaceholder, styles.TitlePlaceholder]} testID="title-placeholder" />
+      <View style={[styles.CategoryPlaceholder, styles.ParticipantPlaceholder]} testID="participant-placeholder" />
+      <View style={[styles.CategoryPlaceholder, styles.CompanyPlaceholder]} testID="company-placeholder" />
+      <View style={styles.IconsPlaceholderContainer} testID="icons-placeholder-container">
+        <View style={styles.Icon} testID="icon" />
+        <View style={styles.Icon} testID="icon" />
       </View>
     </View>
   </View>

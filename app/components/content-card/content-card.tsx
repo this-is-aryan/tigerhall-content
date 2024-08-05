@@ -18,15 +18,15 @@ const TigerHallContentCard = (props: Podcast) => {
     <View style={styles.ContentCardContainer}>
       <ImageBackground resizeMode={'contain'} style={styles.ContentImage} source={{ uri: imageURL }}>
         <View style={styles.ProgressContainer}>
-          <Ionicons name="pie-chart-outline" size={20} color={palette.orange69} />
+          <Ionicons testID="progress-icon" name="pie-chart-outline" size={20} color={palette.orange69} />
           <Text style={styles.Progress}>{`${progressPercentage}% Completed`}</Text>
         </View>
         <View style={styles.ContentSpecsContainer}>
           <View style={styles.Audio}>
-            <Ionicons name={'headset-outline'} size={25} color={palette.white} />
+            <Ionicons testID="headset-icon" name={'headset-outline'} size={25} color={palette.white} />
           </View>
           <View style={styles.ContentLengthContainer}>
-            <Ionicons name={'time-outline'} size={16} color={palette.white} />
+            <Ionicons testID="time-icon" name={'time-outline'} size={16} color={palette.white} />
             <Text style={styles.ContentLength}>{`${duration}m`}</Text>
           </View>
         </View>
@@ -48,8 +48,8 @@ const TigerHallContentCard = (props: Podcast) => {
           <Text numberOfLines={1} ellipsizeMode={'tail'} style={styles.Company}>{`${participants[0]?.company?.trim()}`}</Text>
         )}
         <View style={styles.ShareAndSaveContainer}>
-          <Ionicons style={styles.ShareIcon} name="share-social-outline" size={22} color={palette.orange29} />
-          <Ionicons name="bookmark-outline" size={22} color={palette.orange29} />
+          <Ionicons testID="share-icon" style={styles.ShareIcon} name="share-social-outline" size={22} color={palette.orange29} />
+          <Ionicons testID="bookmark-icon" name="bookmark-outline" size={22} color={palette.orange29} />
         </View>
       </View>
     </View>

@@ -38,3 +38,6 @@ yarn-error.*
 .idea
 .idea/*
 /.idea
+
+# Test Coverage
+coverage

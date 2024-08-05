@@ -8,7 +8,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eslint": "eslint .",
-    "format:ts": "prettier --write '**/*.ts{,x}'"
+    "format:ts": "prettier --write '**/*.ts{,x}'",
+    "test": "jest"
   },
   "dependencies": {
     "@apollo/client": "^3.11.2",
@@ -21,13 +22,33 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^12.5.2",
+    "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "eslint": "^8.57.0",
     "eslint-config-expo": "^7.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^29.7.0",
     "prettier": "^3.3.3",
+    "react-test-renderer": "^18.3.1",
     "typescript": "~5.3.3"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jestSetup.ts"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|@react-native|@react-navigation|@testing-library)"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "app/**/*.{ts,tsx}",
+      "!app/**/*.styles.ts",
+      "!app/**/index.ts"
+    ]
+  }
 }

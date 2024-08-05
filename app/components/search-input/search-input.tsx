@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
-import { styles } from './search-input.styles'
 import { View, TextInput } from 'react-native'
+import { styles } from './search-input.styles'
 import { palette } from '../../theme'
 import { MAX_CHARACTERS_ALLOWED } from '../../constants'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -18,8 +18,8 @@ export const SearchInput = (props: SearchInputProps) => {
   }).current
 
   return (
-    <View style={styles.SearchInputContainer}>
-      <Ionicons name="search" size={25} color="white" />
+    <View style={styles.SearchInputContainer} testID="search-input-container">
+      <Ionicons name="search" size={25} color="white" testID="search-icon" />
       <TextInput
         style={styles.SearchInput}
         cursorColor={palette.white}
@@ -32,8 +32,11 @@ export const SearchInput = (props: SearchInputProps) => {
         placeholderTextColor={palette.grey7D}
         autoCorrect={false}
         autoComplete={'off'}
+        testID="search-text-input"
       />
-      {searchInput?.length ? <Ionicons onPress={onPressCrossIcon} name="close-circle-outline" size={20} color="white" /> : <></>}
+      {searchInput?.length ? (
+        <Ionicons onPress={onPressCrossIcon} name="close-circle-outline" size={20} color="white" testID="clear-icon" />
+      ) : null}
     </View>
   )
 }

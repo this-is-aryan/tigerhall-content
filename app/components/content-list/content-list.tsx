@@ -31,7 +31,7 @@ const TigerhallContentList = (props: ContentListProps) => {
   const ListEmptyComponent = useMemo(
     () => (
       <View style={styles.EmptyListContainer}>
-        <Ionicons name={'reader-outline'} color={palette.orange36} size={100} />
+        <Ionicons testID="empty-icon" name={'reader-outline'} color={palette.orange36} size={100} />
         <Text style={styles.EmptyListText}>{`No Items Available.`}</Text>
       </View>
     ),
@@ -42,7 +42,7 @@ const TigerhallContentList = (props: ContentListProps) => {
     if (!isLoadingMore) return null
     return (
       <View style={styles.ListFooter}>
-        <ActivityIndicator size="large" color={palette.white} />
+        <ActivityIndicator testID="loading-indicator" size="large" color={palette.white} />
         <Text style={styles.FooterText}>Loading more items...</Text>
       </View>
     )
@@ -50,6 +50,7 @@ const TigerhallContentList = (props: ContentListProps) => {
 
   return (
     <FlatList
+      testID="content-list"
       keyExtractor={keyExtractor}
       data={edges}
       renderItem={renderItem}
