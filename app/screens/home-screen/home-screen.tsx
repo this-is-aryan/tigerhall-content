@@ -6,18 +6,22 @@ import { ContentList, ContentLoader, SearchInput } from '../../components'
 import { useQuery } from '@apollo/client'
 import { GET_CONTENTS } from '../../services/graphql/queries'
 import { ContentCardsData, ContentCardsVars } from '../../components/content-card/content-card.types'
-import { LIMIT, TIGERHALL_CONTENT_TYPES } from '../../constants'
+import { LIMIT, MAX_RETRIES, TIGERHALL_CONTENT_TYPES } from '../../constants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { palette } from '../../theme'
 
 // ErrorView Component
-const ErrorView = ({ retry }: { retry: () => void }) => (
+const ErrorView = ({ retry, canRetry }: { retry: () => void; canRetry: boolean }) => (
   <View style={styles.ErrorContainer}>
     <Ionicons color={palette.red05} size={100} name={'alert-circle-outline'} />
     <Text style={styles.ErrorText}>{`Oops! An error has occurred. Please try again later.`}</Text>
-    <TouchableOpacity style={styles.RetryButton} onPress={retry}>
-      <Text style={styles.RetryText}>Retry</Text>
-    </TouchableOpacity>
+    {canRetry ? (
+      <TouchableOpacity style={styles.RetryButton} onPress={retry}>
+        <Text style={styles.RetryText}>Retry</Text>
+      </TouchableOpacity>
+    ) : (
+      <></>
+    )}
   </View>
 )
 
@@ -28,6 +32,8 @@ const HomeScreenComponent = () => {
   const [offset, setOffset] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [debouncedSearchValue, setDebouncedSearchValue] = useState('')
+
+  const [retryCount, setRetryCount] = useState(0)
 
   const { loading, error, data, refetch, fetchMore } = useQuery<ContentCardsData, ContentCardsVars>(GET_CONTENTS, {
     variables: {
@@ -93,12 +99,13 @@ const HomeScreenComponent = () => {
   }, [hasMore, fetchMore, searchValue, offset])
 
   const retryFetch = useCallback(async () => {
+    setRetryCount(retryCount + 1)
     await refetch()
-  }, [refetch])
+  }, [refetch, retryCount])
 
   const ScreenContent = useMemo(() => {
     if (error) {
-      return <ErrorView retry={retryFetch} />
+      return <ErrorView retry={retryFetch} canRetry={retryCount < MAX_RETRIES} />
     }
     if (loading || isListRefreshing) return <ContentLoader />
     if (data) {

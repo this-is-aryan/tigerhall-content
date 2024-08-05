@@ -12,3 +12,5 @@ export const CARD_IMAGE_HEIGHT = 150
 export const CARD_IMAGE_WIDTH = deviceWidth - 32
 
 export const LIMIT = 5
+
+export const MAX_RETRIES = 3
